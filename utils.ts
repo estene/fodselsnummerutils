@@ -1,12 +1,11 @@
 export function getDay(ssn: string): string {
-  let dag = Number(ssn.substring(0, 2));
+  let day = Number(ssn.substring(0, 2));
   if (isDNumber(ssn)) {
-    dag = dag - 40;
-  } else if (dag >= 72) {
-    throw Error('Fødselsnummer er av ukjent format: ' + ssn);
+    day = day - 40;
+  } else if (day >= 72) {
+    throw Error('Fødselsnummer is of unknown format');
   }
-
-  return padLeft(String(dag), 2, '0');
+  return padLeft(String(day), 2, '0');
 }
 
 export function getFourDigitYear(ssn: string) {
@@ -15,15 +14,19 @@ export function getFourDigitYear(ssn: string) {
 
   if (individnummer < 500) {
     return year + 1900;
-  } else if (individnummer < 750 && 54 < year) {
-    return year + 1800;
-  } else if (individnummer < 1000 && year < 40) {
-    return year + 2000;
-  } else if (900 < individnummer || individnummer > 1000 || 39 >= year) {
-    throw new Error('Ugyldig personIdentifikator: ' + ssn);
-  } else {
-    return year + 1900;
   }
+  if (individnummer < 750 && 54 < year) {
+    return year + 1800;
+  }
+  if (individnummer < 1000 && year < 40) {
+    return year + 2000;
+  }
+  if (900 < individnummer || individnummer > 1000 || 39 >= year) {
+    throw new Error(
+      `Individnummer ${individnummer} could not be recognized in a valid range`,
+    );
+  }
+  return year + 1900;
 }
 
 export function isDNumber(ssn: string) {
@@ -36,7 +39,6 @@ export function padLeft(input: string, width: number, symbol: string) {
     return input;
   }
   const leadingSymbol = symbol.length > 0 ? symbol.charAt(0) : ' ';
-
   return leadingSymbol.repeat(width - input.length) + input;
 }
 
